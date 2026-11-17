@@ -82,6 +82,9 @@ def prepare(tag=None):
   path=ROOT/filename;text=path.read_text()
   for before,after in replacements.items():text=text.replace(before,after)
   path.write_text(text)
+ readme=ROOT/'README.md'
+ if readme.is_file():
+  text=readme.read_text();old_version=lock['artifact']['version'];text=text.replace('/releases/tag/v'+old_version,'/releases/tag/v'+version_text).replace('/releases/download/v'+old_version+'/qbit-'+old_version+'-','/releases/download/v'+version_text+'/qbit-'+version_text+'-');readme.write_text(text)
  (ROOT/'runtime.lock.json').write_text(json.dumps(updated,indent=2)+'\n')
  evidence={'format':'qbit-core-upstream-verification-v1','upstreamTag':tag,'upstreamRelease':release['html_url'],'upstreamPublishedAt':release['published_at'],'artifactSha256':digest,'binaries':binaries,'keyPolicySha256':sha(policy_raw),'trustBootstrapCommit':TRUST_COMMIT,'verifiedPrimarySigners':sorted(identities),'signatureQuorum':quorum,'installationPerformed':False}
  out=ROOT/'releases/upstream';out.mkdir(parents=True,exist_ok=True);(out/'verification.json').write_text(json.dumps(evidence,indent=2)+'\n');return evidence
