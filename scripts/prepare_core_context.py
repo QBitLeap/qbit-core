@@ -10,8 +10,8 @@ import stat
 BUILD = Path(__file__).resolve().parents[1]
 SOURCE = BUILD
 FILES = ('Dockerfile', '.dockerignore', 'COPYING.qbit', 'runtime.lock.json')
-ARTIFACT = 'qbit-1.0.0-x86_64-linux-gnu.tar.gz'
-ARTIFACT_SHA256 = 'ae121af03263b55d530e3f3e8719a71362d0950cba82f54a2bc2d6c437a029b5'
+ARTIFACT = 'qbit-1.0.1-x86_64-linux-gnu.tar.gz'
+ARTIFACT_SHA256 = '5f3ce43c3525328f4f0cdcc898516e274a16e170e4ed91ccf648bbb1094f6cb6'
 BASE_IMAGE = 'debian:bookworm-20261104-slim@sha256:c67e92c8099ba22853ab4cfda7cfb494d253d6012ca82dee98ba8976772af018'
 LICENSE_SHA256 = 'b028769f3852a9368ab10bd754ff01ebb741f84a2fa658c9aff82a631bc6ecfc'
 

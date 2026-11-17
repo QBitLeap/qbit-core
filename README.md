@@ -85,3 +85,28 @@ Wrapper code is MIT. See LICENSE, NOTICE and retained upstream notices.
 Protocol source, artwork and dependencies keep their respective upstream
 licenses. Source releases and image publication are separate from native
 macOS/Windows/Linux protocol release artifacts.
+
+## Automatic stable upstream publication
+
+`Publish verified upstream Core update` runs every six hours and on manual
+workflow dispatch. It follows official Qbit-Org/qbit stable 1.x GitHub releases,
+refuses downgrades/prereleases and changed signing policies, and verifies at least
+three distinct trusted primary-key signatures over SHA256SUMS before using any
+archive. The public trust bootstrap is pinned to upstream v1.0.0 commit
+7ebcddb622d6e639041f005a189b048ec2a221fe. Its public certificates contain no secrets.
+Archive, daemon, CLI and unchanged license hashes are committed in the lock.
+
+Source/UI tests run before publishing uniquely tagged candidate images. The
+successful image/source receipt is committed at `releases/upstream/latest.json`.
+The community store's scheduled Core workflow consumes that receipt and requires
+anonymous pulls, exact source provenance and the complete isolated cross-app
+integration before publishing only Core's catalog entries. Failed checks leave the
+catalog unchanged. GitHub schedules can be delayed; both workflows are dispatchable.
+No cross-repository secret or token is required: each workflow writes only its own
+repository. No owner node, wallets, data, memory policy or Umbrel installation is
+accessed. Installed Core upgrades remain an owner-managed operation.
+
+The earlier manual Image release workflow remains available. Its statement above
+that it has no automatic trigger still describes that manual workflow; the new
+upstream workflow owns automatic publication. Trust rotations, major versions and
+license changes stop for source review instead of accepting an unverified update.

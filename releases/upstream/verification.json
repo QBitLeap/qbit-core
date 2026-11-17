@@ -1,0 +1,20 @@
+{
+  "format": "qbit-core-upstream-verification-v1",
+  "upstreamTag": "v1.0.1",
+  "upstreamRelease": "https://github.com/Qbit-Org/qbit/releases/tag/v1.0.1",
+  "upstreamPublishedAt": "2026-11-13T19:48:49Z",
+  "artifactSha256": "5f3ce43c3525328f4f0cdcc898516e274a16e170e4ed91ccf648bbb1094f6cb6",
+  "binaries": {
+    "qbitd": "c52f801024a48bd1bb19804c065840cf93ab799dfc0b1af4644faef1be3fcd0a",
+    "qbit-cli": "6b7ad86f87ca017274f7a10a6998f5c4b36d9c23545b2baddfe16c682708494b"
+  },
+  "keyPolicySha256": "f04ae262bd40cdda5c481fc18cef29b405878e66d06c33b49865ea42b38eaf9f",
+  "trustBootstrapCommit": "7ebcddb622d6e639041f005a189b048ec2a221fe",
+  "verifiedPrimarySigners": [
+    "51F569645F0545B0E6C840C2357052443CE094D8",
+    "A762712935A3FFBC6523EAEBA637B315184F8119",
+    "E875FE223D78E2BA7F785B587BFF9C2A1FB522FC"
+  ],
+  "signatureQuorum": 3,
+  "installationPerformed": false
+}
