@@ -24,6 +24,34 @@
   ],
   "upstreamTag": "v1.0.1",
   "upstreamVerification": {
+    "requiresImageBuild": false,
+    "platformArtifacts": {
+      "macos-arm64": {
+        "name": "qbit-1.0.1-arm64-apple-darwin-unsigned.tar.gz",
+        "url": "https://github.com/Qbit-Org/qbit/releases/download/v1.0.1/qbit-1.0.1-arm64-apple-darwin-unsigned.tar.gz",
+        "sha256": "32ab5b91627fe02d5fd5290cee221634bbf83a3b04ce1bceb30bae3d65ee3844"
+      },
+      "macos-x64": {
+        "name": "qbit-1.0.1-x86_64-apple-darwin-unsigned.tar.gz",
+        "url": "https://github.com/Qbit-Org/qbit/releases/download/v1.0.1/qbit-1.0.1-x86_64-apple-darwin-unsigned.tar.gz",
+        "sha256": "fcbaadb3aa680d975ab04d7177ff6b34b2530dc1a0307eb304fd9e744d741ca6"
+      },
+      "windows-x64": {
+        "name": "qbit-1.0.1-win64-unsigned.zip",
+        "url": "https://github.com/Qbit-Org/qbit/releases/download/v1.0.1/qbit-1.0.1-win64-unsigned.zip",
+        "sha256": "9c1ec2ee30630a1505819c2e0e9ad4aa16c7cdcd22777ed13cbf1074730d4b7b"
+      },
+      "linux-x64": {
+        "name": "qbit-1.0.1-x86_64-linux-gnu.tar.gz",
+        "url": "https://github.com/Qbit-Org/qbit/releases/download/v1.0.1/qbit-1.0.1-x86_64-linux-gnu.tar.gz",
+        "sha256": "5f3ce43c3525328f4f0cdcc898516e274a16e170e4ed91ccf648bbb1094f6cb6"
+      },
+      "linux-arm64": {
+        "name": "qbit-1.0.1-aarch64-linux-gnu.tar.gz",
+        "url": "https://github.com/Qbit-Org/qbit/releases/download/v1.0.1/qbit-1.0.1-aarch64-linux-gnu.tar.gz",
+        "sha256": "a2db7d231c7201cb593949cb36bd02b1c5b4ff31ebb91fab869ae4059b56fd5e"
+      }
+    },
     "format": "qbit-core-upstream-verification-v1",
     "upstreamTag": "v1.0.1",
     "upstreamRelease": "https://github.com/Qbit-Org/qbit/releases/tag/v1.0.1",
@@ -44,5 +72,48 @@
     "installationPerformed": false
   },
   "sourceRevision": "906dfefe5053177d74fcc478ac63ec33bedf7cfe",
-  "catalogAcceptanceRequired": true
+  "catalogAcceptanceRequired": true,
+  "platformChecksPassed": true,
+  "platformChecks": {
+    "macos-x64": {
+      "target": "macos-x64",
+      "upstreamTag": "v1.0.1",
+      "archiveSha256": "fcbaadb3aa680d975ab04d7177ff6b34b2530dc1a0307eb304fd9e744d741ca6",
+      "passed": true,
+      "nodeStarted": false,
+      "installedDataAccessed": false
+    },
+    "linux-x64": {
+      "target": "linux-x64",
+      "upstreamTag": "v1.0.1",
+      "archiveSha256": "5f3ce43c3525328f4f0cdcc898516e274a16e170e4ed91ccf648bbb1094f6cb6",
+      "passed": true,
+      "nodeStarted": false,
+      "installedDataAccessed": false
+    },
+    "linux-arm64": {
+      "target": "linux-arm64",
+      "upstreamTag": "v1.0.1",
+      "archiveSha256": "a2db7d231c7201cb593949cb36bd02b1c5b4ff31ebb91fab869ae4059b56fd5e",
+      "passed": true,
+      "nodeStarted": false,
+      "installedDataAccessed": false
+    },
+    "macos-arm64": {
+      "target": "macos-arm64",
+      "upstreamTag": "v1.0.1",
+      "archiveSha256": "32ab5b91627fe02d5fd5290cee221634bbf83a3b04ce1bceb30bae3d65ee3844",
+      "passed": true,
+      "nodeStarted": false,
+      "installedDataAccessed": false
+    },
+    "windows-x64": {
+      "target": "windows-x64",
+      "upstreamTag": "v1.0.1",
+      "archiveSha256": "9c1ec2ee30630a1505819c2e0e9ad4aa16c7cdcd22777ed13cbf1074730d4b7b",
+      "passed": true,
+      "nodeStarted": false,
+      "installedDataAccessed": false
+    }
+  }
 }
