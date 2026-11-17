@@ -26,6 +26,8 @@ jobs:
           python-version: '3.13'
       - name: Verify official stable release and pinned three-signer quorum
         id: upstream
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: python scripts/upstream_release.py
       - name: Test source and retained UI contracts
         if: steps.upstream.outputs.changed == 'true'

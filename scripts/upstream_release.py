@@ -11,6 +11,13 @@ PLATFORMS={'macos-arm64':'arm64-apple-darwin-unsigned.tar.gz','macos-x64':'x86_6
 def sha(raw):return hashlib.sha256(raw).hexdigest()
 def fetch(url,budget=4*1024**2):
  if not url.startswith(('https://api.github.com/repos/Qbit-Org/qbit/','https://raw.githubusercontent.com/Qbit-Org/qbit/','https://github.com/Qbit-Org/qbit/releases/download/')):raise ValueError('Official upstream URL required')
+ if url.startswith(API+'/')and os.environ.get('GITHUB_ACTIONS')=='true':
+  # Use GitHub's normal client and job-scoped token for API rate limits. Never
+  # forward that credential to release downloads, redirects or raw-file hosts.
+  result=subprocess.run(['gh','api',url],stdout=subprocess.PIPE,stderr=subprocess.DEVNULL,timeout=120)
+  if result.returncode:raise ValueError('Official upstream GitHub API request failed')
+  if len(result.stdout)>budget:raise ValueError('Upstream response budget exceeded')
+  return result.stdout
  with urlopen(Request(url,headers={'User-Agent':'QBitLeap-Core-release-monitor','Accept':'application/vnd.github+json'}),timeout=120)as response:
   raw=response.read(budget+1)
  if len(raw)>budget:raise ValueError('Upstream response budget exceeded')
