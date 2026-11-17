@@ -88,7 +88,7 @@ macOS/Windows/Linux protocol release artifacts.
 
 ## Automatic stable upstream publication
 
-`Publish verified upstream Core update` runs every six hours and on manual
+`Publish verified upstream Core update` runs every twelve hours and on manual
 workflow dispatch. It follows official Qbit-Org/qbit stable 1.x GitHub releases,
 refuses downgrades/prereleases and changed signing policies, and verifies at least
 three distinct trusted primary-key signatures over SHA256SUMS before using any
@@ -110,3 +110,15 @@ The earlier manual Image release workflow remains available. Its statement above
 that it has no automatic trigger still describes that manual workflow; the new
 upstream workflow owns automatic publication. Trust rotations, major versions and
 license changes stop for source review instead of accepting an unverified update.
+
+
+The Core release schedule is 12 hours. macOS (Apple Silicon and Intel), Windows x64,
+and Linux (x64 and ARM64) archives must pass native signed-checksum and version
+checks before the Umbrel image publication job runs. The store verifies those
+platform receipts again before its existing image/integration gates. Desktop
+options use the official upstream binaries; Umbrel uses our tested Docker images.
+
+Future Ollama integration should consume the accepted community-store version and
+digest through the existing managed Umbrel update workflow. Ollama is not installed
+or connected by this release automation. No running node, 8 GiB policy, database,
+wallet, jobs or signing gates are changed by publication.

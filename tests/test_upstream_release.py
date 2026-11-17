@@ -23,11 +23,11 @@ class Upstream(unittest.TestCase):
    with tarfile.open(fileobj=archive,mode='w:gz')as tar:
     for binary in('qbitd','qbit-cli'):
      raw=binary.encode();info=tarfile.TarInfo('qbit-'+new+'/bin/'+binary);info.size=len(raw);tar.addfile(info,io.BytesIO(raw))
-   blob=archive.getvalue();digest=m.sha(blob);policy=(root/'upstream-trust/keys.json').read_bytes();entries=json.loads(policy)['signers'][:3];release={'tag_name':'v'+new,'draft':False,'prerelease':False,'html_url':'https://github.com/Qbit-Org/qbit/releases/tag/v'+new,'published_at':'2026-11-17T00:00:00Z','assets':[{'name':name,'digest':'sha256:'+digest}]+[{'name':'SHA256SUMS.'+s['alias']+'.asc'}for s in entries]}
+   blob=archive.getvalue();digest=m.sha(blob);policy=(root/'upstream-trust/keys.json').read_bytes();entries=json.loads(policy)['signers'][:3];release={'tag_name':'v'+new,'draft':False,'prerelease':False,'html_url':'https://github.com/Qbit-Org/qbit/releases/tag/v'+new,'published_at':'2026-11-17T00:00:00Z','assets':[{'name':'qbit-'+new+'-'+suffix,'digest':'sha256:'+digest}for suffix in m.PLATFORMS.values()]+[{'name':'SHA256SUMS.'+s['alias']+'.asc'}for s in entries]}
    def fetch(url,budget=None):
     if '/releases/latest'in url:return json.dumps(release).encode()
     if url.endswith('/keys.json'):return policy
-    if url.endswith('/SHA256SUMS'):return(digest+'  '+name+'\n').encode()
+    if url.endswith('/SHA256SUMS'):return ''.join(digest+'  qbit-'+new+'-'+suffix+'\n'for suffix in m.PLATFORMS.values()).encode()
     if url.endswith('.asc'):return b'explicit synthetic signature'
     if url.endswith(name):return blob
     if url.endswith('/COPYING'):return(ROOT/'COPYING.qbit').read_bytes()
