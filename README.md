@@ -122,3 +122,15 @@ Future Ollama integration should consume the accepted community-store version an
 digest through the existing managed Umbrel update workflow. Ollama is not installed
 or connected by this release automation. No running node, 8 GiB policy, database,
 wallet, jobs or signing gates are changed by publication.
+
+
+## Upgrade preservation contract
+
+Release tests retain the app identity, data-root mapping, chain/auth mounts, named
+settings volume, owner-setting declarations and credential derivation references.
+Packages do not ship replacement operator hooks, owner settings or templates.
+Existing operator pre-start hooks therefore remain separate from the image and
+apply their saved resource policy before Umbrel starts the updated containers.
+A package default memory ceiling is not the effective ceiling after such a hook.
+Installed-host preflight must confirm the current updater and operator policy;
+public CI does not mount an owner's chain, wallets, credentials or settings.
