@@ -11,6 +11,9 @@ class Upstream(unittest.TestCase):
   line=('a'*64+'  core.tar.gz\n').encode();self.assertEqual(m.checksum(line,'core.tar.gz'),'a'*64)
   for raw in(line+line,b'bad line\n'):
    with self.assertRaises(ValueError):m.checksum(raw,'core.tar.gz')
+ def test_missing_desktop_artifact_is_isolated_to_that_target(self):
+  version='1.0.2';sums=''.join('a'*64+'  qbit-'+version+'-'+suffix+'\n'for suffix in m.PLATFORMS.values()).encode();assets={'qbit-'+version+'-'+suffix:{}for target,suffix in m.PLATFORMS.items()if target!='windows-x64'};rows=m.platform_metadata(sums,assets,'v'+version)
+  self.assertIn('error',rows['windows-x64']);self.assertEqual(rows['linux-x64']['sha256'],'a'*64);self.assertNotIn('error',rows['macos-arm64'])
  def test_signer_identity_errors_and_ambiguity(self):
   key='A'*40;primary='B'*40;status=('[GNUPG:] NEWSIG\n[GNUPG:] GOODSIG '+key[-16:]+' Fixture\n[GNUPG:] VALIDSIG '+key+' 2026-11-13 1 0 4 0 1 10 00 '+primary+'\n').encode();self.assertEqual(m.signer(status,key),primary)
   for raw,expected in[(status,key[:-1]+'C'),(status+b'[GNUPG:] KEYEXPIRED 1\n',key),(status.replace(b'\n',b'\r\n'),key),(status+status,key),(status.replace(b'GOODSIG',b'IGNORED'),key)]:

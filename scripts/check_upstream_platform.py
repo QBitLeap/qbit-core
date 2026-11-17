@@ -10,7 +10,9 @@ def check(target,evidence):
  if platform.system()!=expected_os or platform.machine().lower()!=expected_cpu.lower():raise ValueError('Native target runner required')
  tag=evidence['upstreamTag']
  if re.fullmatch(r'v1\.\d+\.\d+',tag)is None or evidence.get('signatureQuorum',0)<3 or len(set(evidence.get('verifiedPrimarySigners',[])))<evidence['signatureQuorum']:raise ValueError('Verified stable release context required')
- item=evidence['platformArtifacts'][target];url=item['url'];name=item['name'];digest=item['sha256']
+ item=evidence['platformArtifacts'][target]
+ if 'error'in item:raise ValueError('This platform artifact is unavailable; other platforms are independent')
+ url=item['url'];name=item['name'];digest=item['sha256']
  if name!=Path(name).name or not url.startswith('https://github.com/Qbit-Org/qbit/releases/download/'+tag+'/')or url.rsplit('/',1)[1]!=name or not re.fullmatch('[0-9a-f]{64}',digest):raise ValueError('Exact official artifact identity required')
  # Runner temporary storage has room for archives; do not use Cosmic's small /tmp.
  with tempfile.TemporaryDirectory(prefix='core-platform-',dir=os.environ.get('RUNNER_TEMP',str(Path.cwd().parent)))as tmp:

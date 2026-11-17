@@ -41,21 +41,32 @@ def signer(status,expected):
  if expected not in(fingerprint,primary)or not fingerprint.endswith(good[0][1]):raise ValueError('Signature identity differs from pinned policy')
  return primary
 
-def prepare(tag=None):
+def platform_metadata(sums,assets,tag):
+ result={};version=tag[1:];base='https://github.com/Qbit-Org/qbit/releases/download/'+tag+'/'
+ for target,suffix in PLATFORMS.items():
+  filename='qbit-'+version+'-'+suffix
+  try:
+   digest=checksum(sums,filename)
+   if filename not in assets or assets[filename].get('digest')not in(None,'sha256:'+digest):raise ValueError('Artifact unavailable or inconsistent')
+   result[target]={'name':filename,'url':base+filename,'sha256':digest}
+  except ValueError:result[target]={'name':filename,'error':'Official signed artifact unavailable or inconsistent'}
+ return result
+
+def prepare(tag=None,platforms_only=False):
  if tag is not None:stable(tag)
  lock=json.loads((ROOT/'runtime.lock.json').read_bytes());release=json.loads(fetch(API+('/releases/tags/'+tag if tag else'/releases/latest')));tag=release['tag_name']
  if release.get('draft')or release.get('prerelease'):raise ValueError('Stable published release required')
  version=stable(tag);current=tuple(map(int,lock['artifact']['version'].split('.')))
  receipt=ROOT/'releases/upstream/latest.json'
  if version<current:raise ValueError('Upstream downgrade refused')
- if version==current and receipt.is_file():
+ if version==current and receipt.is_file()and not platforms_only:
   saved=json.loads(receipt.read_bytes())
-  if saved.get('upstreamTag')==tag and saved.get('platformChecksPassed')is True and set(saved.get('upstreamVerification',{}).get('platformArtifacts',{}))==set(PLATFORMS):return None
+  if saved.get('upstreamTag')==tag and len(saved.get('images',[]))==2 and all(r.get('published')is True for r in saved['images']):return None
  policy_raw=(ROOT/'upstream-trust/keys.json').read_bytes();policy=json.loads(policy_raw)
  remote=fetch('https://raw.githubusercontent.com/Qbit-Org/qbit/'+tag+'/contrib/keys/operator-keys/keys.json')
  if sha(remote)!=sha(policy_raw):raise ValueError('Release key policy changed; explicit trust rotation review required')
  assets={a['name']:a for a in release['assets']};version_text=tag[1:];name='qbit-'+version_text+'-x86_64-linux-gnu.tar.gz';base='https://github.com/Qbit-Org/qbit/releases/download/'+tag+'/'
- sums=fetch(base+'SHA256SUMS');digest=checksum(sums,name);identities=set()
+ sums=fetch(base+'SHA256SUMS');digest=checksum(sums,name)if not platforms_only else None;identities=set()
  with tempfile.TemporaryDirectory(prefix='.qbit-release-verify-',dir=ROOT.parent)as temporary:
   home=Path(temporary);home.chmod(0o700);sumfile=home/'SHA256SUMS';sumfile.write_bytes(sums)
   for entry in policy['signers']:
@@ -68,6 +79,9 @@ def prepare(tag=None):
    identities.add(signer(result.stdout,entry['signing_fingerprint']))
   quorum=policy['release_lines']['mainnet']['release_signature_quorum']
   if quorum<3 or len(identities)<quorum:raise ValueError('Pinned distinct-signer quorum not met')
+  if platforms_only:
+   evidence={'format':'qbit-core-upstream-verification-v1','upstreamTag':tag,'signatureQuorum':quorum,'verifiedPrimarySigners':sorted(identities),'platformArtifacts':platform_metadata(sums,assets,tag),'requiresImageBuild':False,'installationPerformed':False}
+   output=ROOT/'releases/upstream';output.mkdir(parents=True,exist_ok=True);(output/'verification.json').write_text(json.dumps(evidence,indent=2)+'\n');return evidence
   if version==current:
    if lock['artifact']['sha256']!=digest:raise ValueError('Same upstream version changed artifact; refuse overwrite')
    binaries=lock['binaries']
@@ -93,15 +107,11 @@ def prepare(tag=None):
  if readme.is_file():
   text=readme.read_text();old_version=lock['artifact']['version'];text=text.replace('/releases/tag/v'+old_version,'/releases/tag/v'+version_text).replace('/releases/download/v'+old_version+'/qbit-'+old_version+'-','/releases/download/v'+version_text+'/qbit-'+version_text+'-');readme.write_text(text)
  (ROOT/'runtime.lock.json').write_text(json.dumps(updated,indent=2)+'\n')
- platforms={}
- for target,suffix in PLATFORMS.items():
-  filename='qbit-'+version_text+'-'+suffix;expected=checksum(sums,filename)
-  if filename not in assets or assets[filename].get('digest')not in(None,'sha256:'+expected):raise ValueError('Signed platform artifact missing or inconsistent: '+target)
-  platforms[target]={'name':filename,'url':base+filename,'sha256':expected}
+ platforms=platform_metadata(sums,assets,tag)
  evidence={'requiresImageBuild':version>current,'platformArtifacts':platforms,'format':'qbit-core-upstream-verification-v1','upstreamTag':tag,'upstreamRelease':release['html_url'],'upstreamPublishedAt':release['published_at'],'artifactSha256':digest,'binaries':binaries,'keyPolicySha256':sha(policy_raw),'trustBootstrapCommit':TRUST_COMMIT,'verifiedPrimarySigners':sorted(identities),'signatureQuorum':quorum,'installationPerformed':False}
  out=ROOT/'releases/upstream';out.mkdir(parents=True,exist_ok=True);(out/'verification.json').write_text(json.dumps(evidence,indent=2)+'\n');return evidence
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('--tag');a=p.parse_args();result=prepare(a.tag)
+ p=argparse.ArgumentParser();p.add_argument('--tag');p.add_argument('--platform-checks',action='store_true');a=p.parse_args();result=prepare(a.tag,platforms_only=a.platform_checks)
  if os.environ.get('GITHUB_OUTPUT'):
   with open(os.environ['GITHUB_OUTPUT'],'a')as f:f.write('changed='+str(result is not None).lower()+'\n'+('version='+result['upstreamTag'][1:]+'\nimage_changed='+str(result['requiresImageBuild']).lower()+'\n'if result else''))
  print(json.dumps(result or{'changed':False}))

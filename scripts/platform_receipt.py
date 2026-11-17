@@ -1,4 +1,4 @@
-"""Require complete exact-platform evidence before image/catalog publication."""
+"""Independent desktop evidence checks and Umbrel-only publication receipts."""
 import argparse,json,os,subprocess
 from pathlib import Path
 from upstream_release import PLATFORMS
@@ -9,7 +9,8 @@ def checked(evidence,rows):
   if row.get('target')!=target or row.get('passed')is not True or row.get('nodeStarted')is not False or row.get('installedDataAccessed')is not False or row.get('upstreamTag')!=evidence['upstreamTag']or row.get('archiveSha256')!=evidence['platformArtifacts'][target]['sha256']:raise ValueError('Platform evidence identity or acceptance differs: '+target)
  return rows
 if __name__=='__main__':
- p=argparse.ArgumentParser();p.add_argument('mode',choices=('check','publish'));a=p.parse_args();evidence=json.loads((ROOT/'releases/upstream/verification.json').read_bytes());rows={f.stem:json.loads(f.read_bytes())for f in(ROOT/'.release/platforms').glob('*.json')};checked(evidence,rows)
+ p=argparse.ArgumentParser();p.add_argument('mode',choices=('check','publish'));a=p.parse_args();evidence=json.loads((ROOT/'releases/upstream/verification.json').read_bytes());rows={f.stem:json.loads(f.read_bytes())for f in(ROOT/'.release/platforms').glob('*.json')}
+ if a.mode=='check':checked(evidence,rows)
  if a.mode=='publish':
   version=os.environ['CORE_VERSION']
   if evidence['upstreamTag']!='v'+version:raise ValueError('Publication version differs from verified release')
@@ -18,4 +19,4 @@ if __name__=='__main__':
   else:
    receipt=json.loads((ROOT/'releases/upstream/latest.json').read_bytes())
    if receipt['upstreamTag']!=evidence['upstreamTag']:raise ValueError('Refuse platform-only refresh for different image version')
-  receipt.update(upstreamTag=evidence['upstreamTag'],upstreamVerification=evidence,platformChecksPassed=True,platformChecks=rows,catalogAcceptanceRequired=True);(ROOT/'releases/upstream/latest.json').write_text(json.dumps(receipt,indent=2)+'\n')
+  receipt.pop('platformChecksPassed',None);receipt.pop('platformChecks',None);receipt.update(upstreamTag=evidence['upstreamTag'],upstreamVerification=evidence,publicationScope='umbrel',desktopChecksIndependent=True,catalogAcceptanceRequired=True);(ROOT/'releases/upstream/latest.json').write_text(json.dumps(receipt,indent=2)+'\n')
